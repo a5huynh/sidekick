@@ -3,7 +3,7 @@
 # @Author: ahuynh
 # @Date:   2015-06-18 20:15:30
 # @Last Modified by:   ahuynh
-# @Last Modified time: 2016-02-11 14:31:01
+# @Last Modified time: 2016-02-11 16:41:47
 import unittest
 
 from sidekick import announce_services, check_name, find_matching_container
@@ -17,7 +17,6 @@ class TestSidekick( unittest.TestCase ):
     def setUp( self ):
 
         self.args = parse_args( [ '--name', 'test', '--ip', 'localhost', '--check-ip', '0.0.0.0' ] )
-
         self.etcd_client  = MockEtcd()
 
         self.container = {
