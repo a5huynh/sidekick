@@ -3,7 +3,7 @@
 # @Author: ahuynh
 # @Date:   2015-06-18 20:15:30
 # @Last Modified by:   ahuynh
-# @Last Modified time: 2016-02-11 16:41:47
+# @Last Modified time: 2016-02-11 16:42:23
 import unittest
 
 from sidekick import announce_services, check_name, find_matching_container
@@ -32,7 +32,8 @@ class TestSidekick( unittest.TestCase ):
                 'PublicPort': 9300}],
             'Created': 1427906382,
             'Names': ['/test'],
-            'Status': 'Up 2 days'}
+            'Status': 'Up 2 days'
+        }
 
     def test_announce_services( self ):
         """ Test `announce_services` functionality """
