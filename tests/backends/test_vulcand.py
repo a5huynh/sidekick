@@ -3,7 +3,7 @@
 # @Author: ahuynh
 # @Date:   2016-02-11 14:28:02
 # @Last Modified by:   ahuynh
-# @Last Modified time: 2016-02-11 14:49:02
+# @Last Modified time: 2016-02-11 15:33:08
 import unittest
 
 from sidekick import announce_services, find_matching_container, parse_args
@@ -19,7 +19,7 @@ class TestVulcandBackend( unittest.TestCase ):
             '--name', 'test',
             '--ip', 'localhost',
             '--check-ip', '0.0.0.0',
-            '--vulcand'
+            '--vulcand', 'True'
         ])
 
         self.etcd_client = MockEtcd()
@@ -40,7 +40,7 @@ class TestVulcandBackend( unittest.TestCase ):
             'Status': 'Up 2 days'
         }
 
-        def test_announce_services( self ):
-            """ Test `announce_services` functionality """
-            services = find_matching_container( [ self.container ], self.args )
-            announce_services( services.items(), 'test', self.etcd_client, 0, 0, True )
+    def test_vulcand_announce( self ):
+        """ Test `announce_services` functionality """
+        services = find_matching_container( [ self.container ], self.args )
+        announce_services( services.items(), 'test', self.etcd_client, 0, 0, True )
