@@ -3,7 +3,7 @@
 # @Author: ahuynh
 # @Date:   2015-06-18 20:15:30
 # @Last Modified by:   ahuynh
-# @Last Modified time: 2016-02-11 17:27:50
+# @Last Modified time: 2016-02-26 16:14:09
 import unittest
 
 from sidekick import announce_services, check_name, find_matching_container
@@ -41,18 +41,18 @@ class TestSidekick( unittest.TestCase ):
 
         # Test successful health check
         with patch( 'sidekick.check_health', return_value=True ):
-            announce_services( services.items(), 'test', self.etcd_client, 0, 0, False )
+            announce_services( services.items(), 'test', self.etcd_client, 0, 0, False, self.args )
             self.assertEqual( len( self.etcd_client.written.keys() ), 2 )
 
         # Test unsuccessful health check
         with patch( 'sidekick.check_health', return_value=False ):
-            announce_services( services.items(), 'test', self.etcd_client, 0, 0, False )
+            announce_services( services.items(), 'test', self.etcd_client, 0, 0, False, self.args )
             self.assertEqual( len( self.etcd_client.deleted ), 2 )
 
         # Test correct etcd exception handling
         self.etcd_client = MockEtcd( raise_exception=True )
         with patch( 'logging.error' ) as mock_method:
-            announce_services( services.items(), 'test', self.etcd_client, 0, 0, False )
+            announce_services( services.items(), 'test', self.etcd_client, 0, 0, False, self.args )
             self.assertEquals( str(mock_method.call_args[0][0]), 'Test Exception' )
 
     def test_check_health( self ):

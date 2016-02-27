@@ -3,7 +3,7 @@
 # @Author: ahuynh
 # @Date:   2016-02-11 14:28:02
 # @Last Modified by:   ahuynh
-# @Last Modified time: 2016-02-11 17:27:07
+# @Last Modified time: 2016-02-26 16:15:00
 import unittest
 
 from sidekick import announce_services, find_matching_container, parse_args
@@ -47,17 +47,17 @@ class TestVulcandBackend( unittest.TestCase ):
 
         # Successful health check
         with patch( 'sidekick.check_health', return_value=True ):
-            announce_services( services.items(), 'test', self.etcd_client, 0, 0, True )
+            announce_services( services.items(), 'test', self.etcd_client, 0, 0, True, self.args )
             self.assertEqual( len( self.etcd_client.written.keys() ), 4 )
 
         # Unsuccessful health check
         self.etcd_client._reset()
         with patch( 'sidekick.check_health', return_value=False ):
-            announce_services( services.items(), 'test', self.etcd_client, 0, 0, True )
+            announce_services( services.items(), 'test', self.etcd_client, 0, 0, True, self.args )
             self.assertEqual( len( self.etcd_client.deleted ), 4 )
 
         # Correct etcd exception handling
         self.etcd_client = MockEtcd( raise_exception=True )
         with patch( 'logging.error' ) as mock_method:
-            announce_services( services.items(), 'test', self.etcd_client, 0, 0, True )
+            announce_services( services.items(), 'test', self.etcd_client, 0, 0, True, self.args )
             self.assertEquals( str(mock_method.call_args[0][0]), 'Test Exception' )

@@ -3,7 +3,7 @@
 # @Author: ahuynh
 # @Date:   2015-06-10 16:51:36
 # @Last Modified by:   ahuynh
-# @Last Modified time: 2016-02-11 16:36:44
+# @Last Modified time: 2016-02-26 16:24:21
 '''
     The sidekick should essentially replace job of the following typical
     bash script that is used to announce a service to ETCD.
@@ -79,13 +79,16 @@ def parse_args( args ):
     parser.add_argument( '--vulcand', action='store', type=bool, default=False,
                          help='Selector for LB')
 
+    parser.add_argument( '--vulcand-trust-forwarded-headers', action='store',
+                         type=bool, default=False, help='Trust X-Forwarded-* headers' )
+
     parser.add_argument( '--type', action='store', default='http',
                          help='type for Vulcand')
 
     return parser.parse_args( args )
 
 
-def announce_services( services, etcd_folder, etcd_client, timeout, ttl, vulcand ):
+def announce_services( services, etcd_folder, etcd_client, timeout, ttl, vulcand, args ):
     for key, value in services:
         logger.info( 'Health check for {}'.format( key ) )
         healthy = check_health( value )
@@ -103,15 +106,18 @@ def announce_services( services, etcd_folder, etcd_client, timeout, ttl, vulcand
                     etcd_client.delete( server )
                     etcd_client.delete( frontend )
                 else:
+                    fend_data = {
+                        'Type': value['type'],
+                        'BackendId': value['domain'],
+                        'Route': 'Host(`{0}`)'.format( value['domain'] ),
+                    }
+                    # Should we trust the headers being forwared to vulcand?
+                    if args.vulcand_trust_forwarded_headers:
+                        fend_data[ 'Settings' ] = { 'TrustForwardHeader': True }
                     # Announce this server to ETCD
                     etcd_client.write( backend, json.dumps({ 'Type': value['type'] }), ttl=ttl)
                     etcd_client.write( server, json.dumps({ 'URL': 'http://{uri}'.format( **value ) }), ttl=ttl)
-                    etcd_client.write( frontend, json.dumps({
-                        'Type': value['type'],
-                        'BackendId': value['domain'],
-                        'Route': 'Host(`{0}`)'.format( value['domain'] )
-                    }), ttl=ttl)
-
+                    etcd_client.write( frontend, json.dumps( fend_data ), ttl=ttl)
             except etcd.EtcdException as e:
                 logging.error( e )
         else:
@@ -263,7 +269,8 @@ def main():
                            etcd_client,
                            args.timeout,
                            args.ttl,
-                           args.vulcand )
+                           args.vulcand,
+                           args )
 
 if __name__ == '__main__':
     main()
