@@ -6,7 +6,7 @@ idna==2.0
 py==1.4.28
 pyasn1==0.1.7
 pycparser==2.14
-pyOpenSSL==0.15.1
+pyOpenSSL==17.5.0
 pytest==2.7.1
 pytest-cover==1.0.0
 pytest-coverage==0.0
